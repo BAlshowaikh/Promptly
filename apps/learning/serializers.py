@@ -37,3 +37,5 @@ class ExerciseDetailOutSerializer(serializers.Serializer):
     prompt = serializers.CharField()
     starter_code = serializers.CharField()
     hints = serializers.ListField(child=serializers.CharField(), min_length=2, max_length=2)
+    
+# ------ Serializer 4:  -----------
