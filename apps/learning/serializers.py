@@ -38,4 +38,33 @@ class ExerciseDetailOutSerializer(serializers.Serializer):
     starter_code = serializers.CharField()
     hints = serializers.ListField(child=serializers.CharField(), min_length=2, max_length=2)
     
-# ------ Serializer 4:  -----------
+# ------ Serializer 4: Excercise submission Input Serializer -----------
+class SubmitAttemptInSerializer(serializers.Serializer):
+    """
+    Validates the incoming payload for an exercise submission.
+
+    Args:
+        language_slug (str): The slug of the programming language used.
+        exercise_id (str): The unique identifier of the exercise being attempted.
+        user_code (str): The source code submitted by the user.
+    """
+    language_slug = serializers.CharField()
+    exercise_id = serializers.CharField()
+    user_code = serializers.CharField()
+
+# ------ Serializer 5: Exercise Attempt Output Serializer -----------
+class ExerciseAttemptOutSerializer(serializers.Serializer):
+    """
+    Represents the result and metadata of an exercise attempt.
+
+    Used to return the outcome of a submission, including the evaluation
+    status, feedback message, and the time the attempt was logged.
+    """
+    id = serializers.IntegerField()
+    language_slug = serializers.CharField()
+    exercise_id = serializers.CharField()
+    user_code = serializers.CharField()
+    status = serializers.CharField()
+    response_message = serializers.CharField(allow_blank=True)
+    score = serializers.DecimalField(max_digits=5, decimal_places=2, allow_null=True)
+    created_at = serializers.DateTimeField()

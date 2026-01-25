@@ -8,7 +8,6 @@ from apps.learning.models import LearningProgress
 from apps.accounts.models import User 
 
 # ------------ HELPERS (Private functions) --------------
-
 # ----- HELPER 1: Load the json content ------
 def load_learning_content() -> dict:
     """
@@ -61,7 +60,6 @@ def get_exercise(language: dict, exercise_id: str) -> dict | None:
 
 
 # ----------- SELECTORS -----------------
-
 # ---- Selector 1: get the learning progress model for a particular language ------
 # NOTE: ` * ` is being used to force keyword argument when calling the function
 def learning_progress_get(*, user: User, language_slug: str) -> Optional[LearningProgress]:
