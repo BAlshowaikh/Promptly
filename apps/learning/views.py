@@ -6,6 +6,11 @@ from rest_framework import status
 
 from core.responses import success_response, error_response
 
+# ------- MODELS ----------
+from .models import (
+    LearningProgress
+)
+
 # --------- HELPERS & SELECTORS -------
 from .selectors import (
     load_learning_content,
@@ -14,13 +19,20 @@ from .selectors import (
     
     
 )
+
 # ------ SERIALIZERS --------
 from .serializers import (
     LanguageOutSerializer,
     ExerciseListOutSerializer,
     ExerciseDetailOutSerializer,
+    ExerciseAttemptOutSerializer,
+    SubmitAttemptInSerializer,
+    LearningProgressOutSerializer,
 )
 
+from apps.learning.services import (
+    exercise_submit_attempt
+)
 
 # ------------- VIEWS --------------
 
@@ -120,3 +132,96 @@ class ExerciseDetailApi(APIView):
             data=data, 
             message=f"Exercise '{data.get('title')}' details retrieved successfully."
         )
+        
+# ----- View 4: Hnadle the submission of an exercise attempt
+class SubmitExerciseApi(APIView):
+    """
+    Endpoint: POST learn/exercise/submit/
+    Handles the submission of a user's code attempt for a specific exercise.
+    
+    This endpoint validates the input, executes the comparison logic via the 
+    service layer, and returns the result of the attempt.
+    """
+    authentication_classes = []
+    
+    # Override the post function to handle the submit
+    def post(self, request):
+        """
+        Process the exercise submission.
+        """
+        
+        # Validate the incoming JSON payload using the serializer
+        serializer = SubmitAttemptInSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True) # Validate any custom or field level checks
+
+        # Extract the cleaned and validated data, ready to be passed to the Service layer
+        data = serializer.validated_data
+
+        # Extract user (Currently uses AnonymousUser until Auth is implemented)
+        user = request.user
+
+        try:
+            # Call the service with passed parameters
+            attempt = exercise_submit_attempt(
+                user=user,
+                language_slug=data["language_slug"],
+                exercise_id=data["exercise_id"],
+                user_code=data["user_code"],
+            )
+            
+        except ValueError as exc:
+            msg = str(exc)
+
+            if "not found" in msg.lower():
+                return error_response(
+                    message=msg,
+                    status_code=status.HTTP_404_NOT_FOUND
+                )
+
+            # Fallback for other potential ValueErrors (400 Bad Request)
+            return error_response(
+                message=msg,
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+
+        #Transform the resulting Model instance back into JSON via the Output Serializer
+        out_data = ExerciseAttemptOutSerializer(attempt).data
+        return success_response(
+            data=out_data, 
+            message=f"Attempt processed: {out_data['status'].upper()}"
+        )
+
+# ----- View 5: Retrieve a list of learning progress per language records for the user
+class LearningProgressListApi(APIView):
+    """
+    Endpoint: GET /learn/progress
+    Returns progress for all languages for the current user.
+    """
+    authentication_classes = []  
+    permission_classes = []
+
+    def get(self, request):
+        try:
+            # Extract user (Currently uses AnonymousUser until Auth is implemented)
+            user = request.user  
+
+            # Query the database for all progress records belonging to the user
+            qs = (
+                LearningProgress.objects
+                .filter(user=user)
+                .order_by("language_slug")
+            )
+
+            # Serialize the QuerySet into a list of dictionaries
+            data = LearningProgressOutSerializer(qs, many=True).data
+
+            return success_response(
+                data=data,
+                message="Successfully retrieved learning progress."
+            )
+
+        except Exception as exc:
+            return error_response(
+                message=str(exc),
+                status_code=500
+            )

@@ -84,7 +84,7 @@ def learning_progress_start(*, user, language_slug: str) -> LearningProgress:
     )
 
 
-# ----- Service 2: Service 2: Process an exercise submission and update progress
+# ----- Service 2: Process an exercise submission and update progress
 @transaction.atomic
 def exercise_submit_attempt(
     *,

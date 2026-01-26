@@ -68,3 +68,13 @@ class ExerciseAttemptOutSerializer(serializers.Serializer):
     response_message = serializers.CharField(allow_blank=True)
     score = serializers.DecimalField(max_digits=5, decimal_places=2, allow_null=True)
     created_at = serializers.DateTimeField()
+
+# ------ Serializer 6: Learning progress per language serializer -----------
+class LearningProgressOutSerializer(serializers.Serializer):
+    language_slug = serializers.CharField()
+    started_at = serializers.DateTimeField()
+    last_activity_at = serializers.DateTimeField()
+    current_exercise_id = serializers.CharField(allow_blank=True)
+    completed_exercise_ids = serializers.ListField(child=serializers.CharField())
+    completion_percentage = serializers.DecimalField(max_digits=5, decimal_places=2)
+    
