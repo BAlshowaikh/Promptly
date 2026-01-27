@@ -54,9 +54,21 @@ class LanguagesListApi(APIView):
         content = load_learning_content()  # Load the content
         languages = content.get("languages", []) # Get the languages object
         
+        # Get the list of slugs the user has actually started from the DB
+        #  use .values_list for performance to get just the slugs
+        started_slugs = []
+        if request.user.is_authenticated:
+            started_slugs = LearningProgress.objects.filter(
+                user=request.user
+            ).values_list("language_slug", flat=True)
+
+        # add the 'is_started' key to each dictionary before serializing
+        for lang in languages:
+            lang["is_started"] = lang["slug"] in started_slugs
+            
         # Pass the data to the serializer 
         # `many=True` means I am giving you a list of dictionaries. 
-        # Please loop through them and apply the serializer rules to each one.
+        # loop through them and apply the serializer rules to each one.
         # `.data` will trigger the actual serialization process
         data = LanguageOutSerializer(languages, many=True).data 
         return success_response(
@@ -193,14 +205,14 @@ class SubmitExerciseApi(APIView):
 
 # ----- View 5: Retrieve a list of learning progress per language records for the user
 class LearningProgressListApi(APIView):
-    """
-    Endpoint: GET /learn/progress
-    Returns progress for all languages for the current user.
-    """
     authentication_classes = []  
     permission_classes = []
 
     def get(self, request):
+        """
+        Endpoint: GET /learn/progress
+        Returns progress for all languages for the current user.
+        """
         try:
             # Extract user (Currently uses AnonymousUser until Auth is implemented)
             user = request.user  
@@ -225,3 +237,28 @@ class LearningProgressListApi(APIView):
                 message=str(exc),
                 status_code=500
             )
+            
+    def post(self, request):
+        """
+        Endpoint: POST /learn/progress/
+        Payload: {"language_slug": "python"}
+        """
+        language_slug = request.data.get("language_slug")
+        
+        if not language_slug:
+            return error_response(message="language_slug is required", status_code=400)
+ 
+        # This prevents duplicate records if a user clicks "Start" twice.
+        progress, created = LearningProgress.objects.get_or_create(
+            user=request.user if request.user.is_authenticated else None, # Handle null user for now
+            language_slug=language_slug,
+            defaults={
+                "current_exercise_id": "", 
+                "completed_exercise_ids": []
+            }
+        )
+
+        message = "Path started successfully." if created else "Path already in progress."
+        data = LearningProgressOutSerializer(progress).data
+        
+        return success_response(data=data, message=message) 

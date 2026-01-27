@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "corsheaders", # Accepts requests from other origins
     
     "apps.accounts",
     "apps.ai_models",
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware", # Accepts requests from other origins
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -123,3 +125,5 @@ STATIC_URL = "static/"
 
 # Tell Django to use the custom user model instead of the default one
 AUTH_USER_MODEL = 'accounts.User'
+
+CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
