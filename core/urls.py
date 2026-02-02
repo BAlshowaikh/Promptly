@@ -5,5 +5,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     
     # LEARNING URLS
-    path("api/", include("apps.learning.urls")),
+    path("api/learning/", include("apps.learning.urls")),
+    
+    # AUTH URLS
+    path("api/auth/", include("apps.accounts.urls")),
 ]

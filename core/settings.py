@@ -6,6 +6,7 @@ Django settings for core project.
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 # Load the env variables
 load_dotenv()
@@ -105,6 +106,26 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Custom code to use SimpleJWT
+
+# 1. Tell Django to use the SimpleJWT via adding it to REST_FRAMEWORK settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+# 2. Configure the JWT lifetime
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60), # Access token lasts 1 hour
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    # Refresh token lasts 7 days
+    'ROTATE_REFRESH_TOKENS': True,                   # Give brand new refresh token and delete the old one
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),               
+}
+
+# Tell Django to use the custom user model instead of the default one
+AUTH_USER_MODEL = 'accounts.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
@@ -122,9 +143,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
-
-# Tell Django to use the custom user model instead of the default one
-AUTH_USER_MODEL = 'accounts.User'
 
 # CORS configuration
 CORS_ALLOW_CREDENTIALS = True
