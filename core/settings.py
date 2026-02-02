@@ -126,4 +126,6 @@ STATIC_URL = "static/"
 # Tell Django to use the custom user model instead of the default one
 AUTH_USER_MODEL = 'accounts.User'
 
+# CORS configuration
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]

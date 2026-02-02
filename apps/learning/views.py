@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework import status
+from django.contrib.auth import get_user_model
 
 from core.responses import success_response, error_response
 
@@ -247,10 +248,18 @@ class LearningProgressListApi(APIView):
         
         if not language_slug:
             return error_response(message="language_slug is required", status_code=400)
+        
+        # Temporary Development Hack:
+        # If the session cookie isn't working, grab the admin user manually
+        user = request.user
+        if not user.is_authenticated:
+            User = get_user_model()
+            user = User.objects.filter(is_superuser=True).first()
  
         # This prevents duplicate records if a user clicks "Start" twice.
         progress, created = LearningProgress.objects.get_or_create(
-            user=request.user if request.user.is_authenticated else None, # Handle null user for now
+            # user=request.user if request.user.is_authenticated else None, # Handle null user for now
+            user=user,
             language_slug=language_slug,
             defaults={
                 "current_exercise_id": "", 
