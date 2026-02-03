@@ -1,0 +1,208 @@
+{
+  "languages": [
+    {
+      "slug": "python",
+      "name": "Python",
+      "version": "3.x",
+      "description": "Learn Python basics through small practical exercises.",
+      "exercises": [
+        {
+          "id": "py-01",
+          "title": "Hello, Python",
+          "difficulty": "easy",
+          "prompt": "Write a program that prints the text: Hello, Python",
+          "starter_code": "print()",
+          "expected_code": "print('Hello, Python')",
+          "hints": [
+            "Use the print function.",
+            "Pass the text as a string inside print()."
+          ]
+        },
+        {
+          "id": "py-02",
+          "title": "Add Two Numbers",
+          "difficulty": "easy",
+          "prompt": "Create a program that prints the sum of 3 and 5.",
+          "starter_code": "result = \nprint(result)",
+          "expected_code": "result = 3 + 5\nprint(result)",
+          "hints": [
+            "Add the two numbers using the + operator.",
+            "Store the result in a variable before printing."
+          ]
+        },
+        {
+          "id": "py-03",
+          "title": "Variable Assignment",
+          "difficulty": "easy",
+          "prompt": "Assign the value 10 to a variable named x and print it.",
+          "starter_code": "x = \nprint(x)",
+          "expected_code": "x = 10\nprint(x)",
+          "hints": [
+            "Use the = operator to assign a value.",
+            "Make sure x is printed, not the number directly."
+          ]
+        },
+        {
+          "id": "py-04",
+          "title": "String Length",
+          "difficulty": "medium",
+          "prompt": "Print the length of the string 'Python'.",
+          "starter_code": "text = \"Python\"\nprint()",
+          "expected_code": "text = \"Python\"\nprint(len(text))",
+          "hints": [
+            "Python has a built-in function to get length.",
+            "Use len(text) inside print()."
+          ]
+        },
+        {
+          "id": "py-05",
+          "title": "Simple Condition",
+          "difficulty": "medium",
+          "prompt": "Print 'Yes' if 5 is greater than 3, otherwise print 'No'.",
+          "starter_code": "if :\n    print()\nelse:\n    print()",
+          "expected_code": "if 5 > 3:\n    print('Yes')\nelse:\n    print('No')",
+          "hints": [
+            "Use a comparison operator like >.",
+            "Place the print statements inside the if and else blocks."
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "javascript",
+      "name": "JavaScript",
+      "version": "ES6",
+      "description": "Practice JavaScript fundamentals with simple exercises.",
+      "exercises": [
+        {
+          "id": "js-01",
+          "title": "Hello, JavaScript",
+          "difficulty": "easy",
+          "prompt": "Write a program that logs 'Hello, JavaScript' to the console.",
+          "starter_code": "console.log();",
+          "expected_code": "console.log('Hello, JavaScript');",
+          "hints": [
+            "Use console.log to print output.",
+            "The text should be inside quotes."
+          ]
+        },
+        {
+          "id": "js-02",
+          "title": "Add Numbers",
+          "difficulty": "easy",
+          "prompt": "Log the result of adding 4 and 6.",
+          "starter_code": "const result = ;\nconsole.log(result);",
+          "expected_code": "const result = 4 + 6;\nconsole.log(result);",
+          "hints": [
+            "Use the + operator to add numbers.",
+            "Assign the result to the variable before logging."
+          ]
+        },
+        {
+          "id": "js-03",
+          "title": "Variable Output",
+          "difficulty": "easy",
+          "prompt": "Create a variable named x with value 7 and log it.",
+          "starter_code": "let x = ;\nconsole.log(x);",
+          "expected_code": "let x = 7;\nconsole.log(x);",
+          "hints": [
+            "Use let or const to declare a variable.",
+            "Log the variable name, not the value directly."
+          ]
+        },
+        {
+          "id": "js-04",
+          "title": "String Length",
+          "difficulty": "medium",
+          "prompt": "Log the length of the string 'JavaScript'.",
+          "starter_code": "const text = \"JavaScript\";\nconsole.log();",
+          "expected_code": "const text = \"JavaScript\";\nconsole.log(text.length);",
+          "hints": [
+            "Strings have a length property.",
+            "Use text.length inside console.log()."
+          ]
+        },
+        {
+          "id": "js-05",
+          "title": "Conditional Check",
+          "difficulty": "medium",
+          "prompt": "Log 'Correct' if 10 is equal to 10, otherwise log 'Wrong'.",
+          "starter_code": "if () {\n  console.log();\n} else {\n  console.log();\n}",
+          "expected_code": "if (10 === 10) {\n  console.log('Correct');\n} else {\n  console.log('Wrong');\n}",
+          "hints": [
+            "Use a comparison operator like ===.",
+            "Put the correct message inside the if block."
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "sql",
+      "name": "SQL",
+      "version": "ANSI",
+      "description": "Learn basic SQL queries and syntax.",
+      "exercises": [
+        {
+          "id": "sql-01",
+          "title": "Select All",
+          "difficulty": "easy",
+          "prompt": "Write a SQL query to select all columns from a table named users.",
+          "starter_code": "SELECT",
+          "expected_code": "SELECT * FROM users;",
+          "hints": [
+            "Use * to select all columns.",
+            "End the query with a semicolon."
+          ]
+        },
+        {
+          "id": "sql-02",
+          "title": "Select Specific Column",
+          "difficulty": "easy",
+          "prompt": "Write a SQL query to select the name column from users.",
+          "starter_code": "SELECT  FROM users;",
+          "expected_code": "SELECT name FROM users;",
+          "hints": [
+            "Place the column name after SELECT.",
+            "The table name comes after FROM."
+          ]
+        },
+        {
+          "id": "sql-03",
+          "title": "Where Clause",
+          "difficulty": "medium",
+          "prompt": "Select all users where age is greater than 18.",
+          "starter_code": "SELECT * FROM users WHERE",
+          "expected_code": "SELECT * FROM users WHERE age > 18;",
+          "hints": [
+            "Use the > operator for comparison.",
+            "Conditions go after the WHERE keyword."
+          ]
+        },
+        {
+          "id": "sql-04",
+          "title": "Order Results",
+          "difficulty": "medium",
+          "prompt": "Select all users ordered by created_at descending.",
+          "starter_code": "SELECT * FROM users",
+          "expected_code": "SELECT * FROM users ORDER BY created_at DESC;",
+          "hints": [
+            "Use ORDER BY to sort results.",
+            "DESC means descending order."
+          ]
+        },
+        {
+          "id": "sql-05",
+          "title": "Limit Results",
+          "difficulty": "medium",
+          "prompt": "Select the first 5 users from the users table.",
+          "starter_code": "SELECT * FROM users",
+          "expected_code": "SELECT * FROM users LIMIT 5;",
+          "hints": [
+            "Use LIMIT to restrict the number of rows.",
+            "The number comes after the LIMIT keyword."
+          ]
+        }
+      ]
+    }
+  ]
+}
