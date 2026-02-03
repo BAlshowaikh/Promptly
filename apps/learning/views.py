@@ -4,6 +4,8 @@ from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework import status
 from django.contrib.auth import get_user_model
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication # This will help django chekc the token sengt form react
 
 from core.responses import success_response, error_response
 
@@ -17,8 +19,6 @@ from .selectors import (
     load_learning_content,
     get_language,
     get_exercise,
-    
-    
 )
 
 # ------ SERIALIZERS --------
@@ -155,7 +155,8 @@ class SubmitExerciseApi(APIView):
     This endpoint validates the input, executes the comparison logic via the 
     service layer, and returns the result of the attempt.
     """
-    authentication_classes = []
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     
     # Override the post function to handle the submit
     def post(self, request):
