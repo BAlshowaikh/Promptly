@@ -13,7 +13,7 @@ class RegisterView(generics.GenericAPIView):
 
     # Override the post method
     def post(self, request, *args, **kwargs):
-        # 1. Validation using the serializer
+        # Validation using the serializer
         serializer = self.get_serializer(data=request.data)
         
         # If there is a invalid field tghat the serializer detects
