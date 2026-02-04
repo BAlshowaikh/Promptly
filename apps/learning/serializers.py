@@ -10,6 +10,8 @@ class LanguageOutSerializer(serializers.Serializer):
     name = serializers.CharField()
     version = serializers.CharField(required=False, allow_blank=True)
     description = serializers.CharField(required=False, allow_blank=True)
+    is_started = serializers.BooleanField(default=False)
+    completion_percentage = serializers.FloatField(default=0.0)
 
 # --------- Serializer 2: List Exercises for each language -----
 class ExerciseListOutSerializer(serializers.Serializer):
@@ -22,6 +24,8 @@ class ExerciseListOutSerializer(serializers.Serializer):
     id = serializers.CharField()
     title = serializers.CharField()
     difficulty = serializers.CharField()
+    is_completed = serializers.BooleanField(default=False)
+    is_locked = serializers.BooleanField(default=False)
 
 # ------ Serializer 3: Details for each exercise -----------
 class ExerciseDetailOutSerializer(serializers.Serializer):

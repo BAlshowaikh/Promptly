@@ -18,5 +18,5 @@ urlpatterns = [
     path("login/", TokenObtainPairView.as_view(), name="login"),
     
     # Refresh the token auto (use the built in views from DRF JWT)
-    path("login/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
