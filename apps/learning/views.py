@@ -48,7 +48,7 @@ class LanguagesListApi(APIView):
         A list of language objects containing name, slug, and version.
     """
     
-    authentication_classes = []
+    authentication_classes = [JWTAuthentication]
     
     # Override the get method
     def get(self, request):
@@ -63,9 +63,23 @@ class LanguagesListApi(APIView):
                 user=request.user
             ).values_list("language_slug", flat=True)
 
+        # ---------- Logic for started langauges ----------
         # add the 'is_started' key to each dictionary before serializing
         for lang in languages:
             lang["is_started"] = lang["slug"] in started_slugs
+        
+        # ---------- Logic for percentage_completion ----------
+        # Create a dictionary of {slug: percentage} for the user
+        user_progress_map = {}
+        if request.user.is_authenticated:
+            progress_records = LearningProgress.objects.filter(user=request.user)
+            user_progress_map = {p.language_slug: p.completion_percentage for p in progress_records}
+
+        for lang in languages:
+            slug = lang["slug"]
+            lang["is_started"] = slug in user_progress_map
+            # Default to 0 if not started
+            lang["completion_percentage"] = user_progress_map.get(slug, 0)
             
         # Pass the data to the serializer 
         # `many=True` means I am giving you a list of dictionaries. 
@@ -85,7 +99,7 @@ class LanguageExercisesListApi(APIView):
     Retrieve all exercises for a specific language slug.
     """
     
-    authentication_classes = []
+    authentication_classes = [JWTAuthentication]
         
     def get(self, request, language_slug: str):
         content = load_learning_content() # Load the content
@@ -100,6 +114,30 @@ class LanguageExercisesListApi(APIView):
 
         # Get the list of excerises dedicated for the specified language
         exercises = language.get("exercises", [])
+        
+        # Logic to check the progress
+        completed_ids = []
+        if request.user.is_authenticated:
+            progress = LearningProgress.objects.filter(
+                user=request.user, 
+                language_slug=language_slug
+            ).first()
+            if progress:
+                completed_ids = progress.completed_exercise_ids
+
+        # Apply sequential locking logic (For FE view)
+        for index, ex in enumerate(exercises):
+            ex_id = str(ex.get("id"))
+            ex["is_completed"] = ex_id in completed_ids
+            
+            if index == 0:
+                # First exercise is always unlocked
+                ex["is_locked"] = False
+            else:
+                # Locked if the PREVIOUS exercise wasn't completed
+                prev_ex_id = str(exercises[index-1].get("id"))
+                ex["is_locked"] = prev_ex_id not in completed_ids
+                
         # Return list-only shape (id/title/difficulty)
         data = ExerciseListOutSerializer(exercises, many=True).data # Call the serializer
         
