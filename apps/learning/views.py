@@ -288,8 +288,6 @@ class LearningProgressListApi(APIView):
         if not language_slug:
             return error_response(message="language_slug is required", status_code=400)
         
-        # Temporary Development Hack:
-        # If the session cookie isn't working, grab the admin user manually
         user = request.user
         if not user.is_authenticated:
             User = get_user_model()
