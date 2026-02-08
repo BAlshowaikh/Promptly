@@ -7,6 +7,7 @@ class AiProvider(models.TextChoices):
     OPENAI = "openai", "OpenAI"
     GOOGLE = "google", "Google"
     LOCAL = "local", "Local"
+    OLLAMA = "ollama", "Ollama"
 
 # ----------- Model 1: This model will store the LLMs 
 class AiModel(TimeStampedModel):
@@ -27,3 +28,4 @@ class AiModel(TimeStampedModel):
 
     def __str__(self):
         return f"{self.provider}:{self.model_name}"
+
