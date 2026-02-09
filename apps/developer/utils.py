@@ -106,3 +106,22 @@ def get_session_history(run_instance, k=5):
             explainer_history.append(AIMessage(content=explainer_res.output))
             
     return {"coder": coder_history, "explainer": explainer_history}
+
+# --------------- Function 3: Stream the explainer responde only
+def generate_explainer_only_stream(session, user_prompt, history_messages, run_instance):
+    try:
+        explainer_cfg = session.model_configs.get(role="explainer", is_enabled=True)
+        orchestrator = OllamaOrchestrator(None, explainer_cfg) # No coder needed
+        
+        full_explanation = ""
+        # pass an empty string for 'full_code' since no new code was generated
+        for chunk in orchestrator.get_explainer_stream(user_prompt, "", history_messages['explainer']):
+            content = chunk.content
+            full_explanation += content
+            yield json.dumps({"sender": "explainer", "text": content}) + "\n"
+            
+        # Save results
+        run_instance.status = RunResultStatus.SUCCESS
+        run_instance.save()
+    except Exception as e:
+        yield json.dumps({"sender": "explainer", "error": str(e)}) + "\n"

@@ -18,7 +18,6 @@ class AiModelOutSerializer(serializers.ModelSerializer):
         model = AiModel
         fields = ['id', 'provider', 'model_name']
         
-
 # -------------- Serializer 2: Handles the listing/adding and updating for the llms setting in each session
 class DevSessionModelConfigSerializer(serializers.ModelSerializer):
     """
@@ -81,3 +80,27 @@ class DevSessionCreateInSerializer(serializers.ModelSerializer):
     class Meta:
         model = DevSession
         fields = ['title', 'run_mode']
+        
+# ----------- Serializer 6: To handle creation of DevSession and DevSessionModelConfiguration
+class DevSessionCreateAllInSerializer(serializers.ModelSerializer):
+    """
+    Serializer to handle the creation of a Dev session and its associated LLMs 
+    """
+    # Expect and array of 2 config objects from the frontend
+    model_configs = DevSessionModelConfigSerializer(many=True)
+
+    class Meta:
+        model = DevSession
+        fields = ['title', 'run_mode', 'model_configs']
+
+    def create(self, validated_data):
+        configs_data = validated_data.pop('model_configs')
+        # 1. Create the session
+        session = DevSession.objects.create(**validated_data)
+        
+        # 2. Create the associated model configurations
+        for config in configs_data:
+            DevSessionModelConfig.objects.create(session=session, **config)
+            
+        return session
+    
