@@ -1,4 +1,4 @@
-from venv import logger
+import logging
 from django.http import StreamingHttpResponse
 from rest_framework.views import APIView
 from rest_framework import status
@@ -24,6 +24,8 @@ from core.responses import (
     success_response,
     error_response
 )
+
+logger = logging.getLogger(__name__)
 
 # -------------- VIEWS ---------------
 
@@ -65,12 +67,28 @@ class DevSessionListCreateView(APIView):
 # --------------- View 2: Show the session details and session configuration (models) details
 class DevSessionDetailView(APIView):
     """
-    Endpoint 3: Show session details (Coder/Explainer models configs)
+    Endpoint 3: Show session details (Coder/Explainer models configs) and handle delete
     """
     def get(self, request, session_id):
         session = get_object_or_404(DevSession, id=session_id, user=request.user)
         serializer = DevSessionDetailOutSerializer(session)
         return success_response(data=serializer.data)
+
+    def delete(self, request, session_id):
+        try:
+            # 1. Fetch the session
+            session = get_object_or_404(DevSession, id=session_id, user=request.user)
+            
+            # 2. Hard Delete
+            # Because of on_delete=models.CASCADE in DevSessionModelConfig,
+            # this single line deletes the session AND all associated configs.
+            session.delete()
+            
+            return success_response(message="Session and associated configurations deleted successfully.")
+
+        except Exception as e:
+            logger.error(f"Delete Error: {str(e)}")
+            return error_response(message="An error occurred while deleting the session.")
 
 # ----------- View 3: Handle requests to the LLMs (click the run or send in the chat)
 class DevRunStreamView(APIView):
