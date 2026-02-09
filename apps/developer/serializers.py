@@ -104,3 +104,18 @@ class DevSessionCreateAllInSerializer(serializers.ModelSerializer):
             
         return session
     
+# ----------- Serialzier 7: Toi get the list of the ai models avaibale
+class AiModelOutSerializer(serializers.ModelSerializer):
+    """
+    Data for the AI Model dropdown menu in the session creation.
+    """
+    # Combines provider and model name for a cleaner UI label
+    display_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AiModel
+        fields = ['id', 'display_name', 'provider', 'model_name']
+
+    def get_display_name(self, obj):
+        return f"{obj.get_provider_display()} - {obj.model_name}"
+    
