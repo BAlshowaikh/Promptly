@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     
     "apps.accounts",
     "apps.ai_models",
-    "apps.development",
+    "apps.developer",
     "apps.learning",
     "apps.llm"
 ]

@@ -22,6 +22,7 @@ class RunResultStatus(models.TextChoices):
     ERROR = "error", "Error"
     TIMEOUT = "timeout", "Timeout"
     CANCELLED = "cancelled", "Cancelled"
+    PENDING = "pending", "Pending"
 
 # ------- Model 1: A session represnts "project" or "chat", user can create many sessions with different configurations
 class DevSession(TimeStampedModel):
@@ -109,6 +110,11 @@ class DevRun(models.Model):
 
     user_prompt = models.TextField()
     context_code = models.TextField(blank=True, default="")
+    status = models.CharField(
+        max_length=20, 
+        choices=RunResultStatus.choices, 
+        default=RunResultStatus.PENDING
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 

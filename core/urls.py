@@ -7,6 +7,9 @@ urlpatterns = [
     # LEARNING URLS
     path("api/learning/", include("apps.learning.urls")),
     
+    # DEVELOPER URLS
+    path("api/developing/", include("apps.developer.urls")),
+    
     # AUTH URLS
     path("api/auth/", include("apps.accounts.urls")),
 ]
