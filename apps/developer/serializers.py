@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from apps.ai_models.models import AiModel
 from .models import (
+    DevRunResult,
     DevSession, 
     DevSessionModelConfig, 
     DevRun, 
@@ -52,27 +53,8 @@ class DevSessionOutSerializer(serializers.ModelSerializer):
             'last_activity_at'
         ]
 
-# ------- Serializer 4: Deatailed serializer for user session
-class DevSessionDetailOutSerializer(serializers.ModelSerializer):
-    """
-    Comprehensive data for a single Session, including its
-    Coder and Explainer configurations.
-    """
-    # This will retrun two objects one for the coder and the other for explainer
-    model_configs = DevSessionModelConfigSerializer(many=True, read_only=True)
-    
-    class Meta:
-        model = DevSession
-        fields = [
-            'id', 
-            'title', 
-            'run_mode', 
-            'is_archived', 
-            'last_activity_at', 
-            'model_configs'
-        ]
 
-# ---------- Serializer 5: Handles the creation of 
+# ---------- Serializer 4: Handles the creation of 
 class DevSessionCreateInSerializer(serializers.ModelSerializer):
     """
     Handles the creation of a new session. 
@@ -81,7 +63,7 @@ class DevSessionCreateInSerializer(serializers.ModelSerializer):
         model = DevSession
         fields = ['title', 'run_mode']
         
-# ----------- Serializer 6: To handle creation of DevSession and DevSessionModelConfiguration
+# ----------- Serializer 5: To handle creation of DevSession and DevSessionModelConfiguration
 class DevSessionCreateAllInSerializer(serializers.ModelSerializer):
     """
     Serializer to handle the creation of a Dev session and its associated LLMs 
@@ -104,7 +86,7 @@ class DevSessionCreateAllInSerializer(serializers.ModelSerializer):
             
         return session
     
-# ----------- Serialzier 7: Toi get the list of the ai models avaibale
+# ----------- Serialzier 6: Toi get the list of the ai models avaibale
 class AiModelOutSerializer(serializers.ModelSerializer):
     """
     Data for the AI Model dropdown menu in the session creation.
@@ -118,4 +100,56 @@ class AiModelOutSerializer(serializers.ModelSerializer):
 
     def get_display_name(self, obj):
         return f"{obj.get_provider_display()} - {obj.model_name}"
+    
+    
+# ---------- Serializer 7: Chat Result (Individual AI Responses)
+class DevRunResultOutSerializer(serializers.ModelSerializer):
+    # This reaches into the config to pull the role (coder/explainer)
+    role = serializers.CharField(source='session_model_config.role')
+
+    class Meta:
+        model = DevRunResult
+        fields = ['id', 'role', 'output', 'status', 'created_at']
+
+# ---------- Serializer 8: Chat Run (The User Prompt Grouping)
+class DevRunOutSerializer(serializers.ModelSerializer):
+    # 'results' matches the related_name in your DevRunResult model
+    results = DevRunResultOutSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = DevRun
+        fields = ['id', 'user_prompt', 'context_code', 'status', 'created_at', 'results']
+        
+# ------- Serializer 9: Deatailed serializer for user session
+class DevSessionDetailOutSerializer(serializers.ModelSerializer):
+    """
+    Comprehensive data for a single Session, including its
+    Coder and Explainer configurations and their history
+    """
+    # This will retrun two objects one for the coder and the other for explainer
+    model_configs = DevSessionModelConfigSerializer(many=True, read_only=True)
+    
+    runs = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = DevSession
+        fields = [
+            'id', 
+            'title', 
+            'run_mode', 
+            'is_archived', 
+            'last_activity_at', 
+            'model_configs',
+            'runs'
+        ]
+        
+    def get_runs(self, obj):
+        # 1. Newest 5 runs
+        last_five_runs = obj.runs.all().order_by('-created_at')[:5]
+        
+        # 2. Flip them so the oldest of the 5 is first (standard chat flow)
+        ordered_runs = list(reversed(last_five_runs))
+        
+        # 3. Use your nested serializer
+        return DevRunOutSerializer(ordered_runs, many=True).data
     

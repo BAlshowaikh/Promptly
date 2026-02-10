@@ -3,6 +3,7 @@ from django.http import StreamingHttpResponse
 from rest_framework.views import APIView
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from django.db.models import Prefetch
 
 from apps.ai_models.models import AiModel
 from apps.developer.utils import (
@@ -70,7 +71,17 @@ class DevSessionDetailView(APIView):
     Endpoint 3: Show session details (Coder/Explainer models configs) and handle delete
     """
     def get(self, request, session_id):
-        session = get_object_or_404(DevSession, id=session_id, user=request.user)
+        # Prefetch all teh required models at once rather than hitting the DB many times for the same requets
+        session = get_object_or_404(DevSession.objects.prefetch_related('model_configs__ai_model', 
+                Prefetch(
+                    'runs', 
+                    queryset=DevRun.objects.order_by('-created_at') # Optimization for Serializer 9
+                ),
+                'runs__results__session_model_config' # For Serializer 7 (to get the role)
+            ),
+            id=session_id,
+            user=request.user
+        )
         serializer = DevSessionDetailOutSerializer(session)
         return success_response(data=serializer.data)
 
