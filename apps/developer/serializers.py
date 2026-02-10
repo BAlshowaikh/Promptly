@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from ai_models.models import AiModel
+from apps.ai_models.models import AiModel
 from .models import (
     DevSession, 
     DevSessionModelConfig, 

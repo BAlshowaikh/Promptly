@@ -2,7 +2,7 @@ import json
 import logging
 from langchain_core.messages import HumanMessage, AIMessage
 
-from ai_models.services import OllamaOrchestrator
+from apps.ai_models.services import OllamaOrchestrator
 from apps.developer.models import DevRunResult, RunResultStatus
 
 logger = logging.getLogger(__name__)

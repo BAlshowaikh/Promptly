@@ -5,7 +5,8 @@ import os
 from dotenv import load_dotenv
 from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
-from langchain.memory import ConversationBufferWindowMemory # Reacts as a short-term memory for AI so we can show the last messages
+# from langchain.memory import ConversationBufferWindowMemory # Reacts as a short-term memory for AI so we can show the last messages
+from langchain_classic.memory import ConversationBufferWindowMemory
 
 load_dotenv()
 
@@ -20,26 +21,34 @@ class OllamaOrchestrator:
         """
         
         # ---- 1.Setup for Coder Model using the passed configurations (Our model)
-        self.coder_llm = ChatOllama(
-            model = coder_config.ai_model.model_name,
-            temperature=float(coder_config.temperature),
-            base_url=os.getenv("OLLAMA_URL")
-        )
-        
-        # Defines the SystemMessage to be passed to the LLM
-        self.coder_system_prompt = coder_config.system_prompt or "You are an expert coder. Output only code."
-        
-        # ----- 2. Setup for explainer using the passed configurations (Our model)
-        self.explainer_llm = ChatOllama(
-            model = explainer_config.ai_model.model_name,
-            temperature=float(explainer_config.temperature),
-            base_url=os.getenv("OLLAMA_URL")
-        )
-         # Defines the SystemMessage to be passed to the LLM
-        self.explainer_system_prompt = explainer_config.system_prompt or "You are a technical tutor. Explain code clearly."
-        
-        # ------ Memory config
-        # Remember the last 5 intercation
+        # 1. Coder initilization
+        if coder_config and coder_config.ai_model:
+            c_name = str(coder_config.ai_model.model_name).strip()
+            
+            self.coder_llm = ChatOllama(
+                model=c_name, 
+                temperature=float(coder_config.temperature),
+                base_url=os.getenv("OLLAMA_URL", "http://127.0.0.1:11434"),
+                num_ctx=2048
+            )
+            self.coder_system_prompt = coder_config.system_prompt
+        else:
+            print("--- CODER CONFIG MISSING OR INVALID ---")
+            self.coder_llm = None
+
+        # 2. Explainer initilization
+        if explainer_config and explainer_config.ai_model:
+            e_name = str(explainer_config.ai_model.model_name).strip()
+            self.explainer_llm = ChatOllama(
+                model=e_name,
+                temperature=float(explainer_config.temperature),
+                base_url=os.getenv("OLLAMA_URL", "http://127.0.0.1:11434"),
+                num_ctx=2048
+            )
+            self.explainer_system_prompt = explainer_config.system_prompt
+        else:
+            self.explainer_llm = None
+
         self.memory = ConversationBufferWindowMemory(k=5, return_messages=True)
         
         # ---- Function 1:
@@ -76,5 +85,5 @@ class OllamaOrchestrator:
         messages.extend(history_messages)
         messages.append(HumanMessage(content=combined_prompt))
 
-            return self.explainer_llm.stream(messages)
+        return self.explainer_llm.stream(messages)
         

@@ -121,7 +121,7 @@ class DevRunStreamView(APIView):
 
             # --- 5. Return the Stream ---
             response = StreamingHttpResponse(stream, content_type='application/json')
-            response['X-Accel-Buffering'] = 'no'] 
+            response['X-Accel-Buffering'] = 'no'
             return response
 
         except Exception as e:
