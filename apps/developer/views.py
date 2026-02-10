@@ -75,9 +75,9 @@ class DevSessionDetailView(APIView):
         session = get_object_or_404(DevSession.objects.prefetch_related('model_configs__ai_model', 
                 Prefetch(
                     'runs', 
-                    queryset=DevRun.objects.order_by('-created_at') # Optimization for Serializer 9
+                    queryset=DevRun.objects.order_by('-created_at') 
                 ),
-                'runs__results__session_model_config' # For Serializer 7 (to get the role)
+                'runs__results__session_model_config' 
             ),
             id=session_id,
             user=request.user

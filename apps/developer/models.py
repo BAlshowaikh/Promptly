@@ -110,6 +110,7 @@ class DevRun(models.Model):
 
     user_prompt = models.TextField()
     context_code = models.TextField(blank=True, default="")
+    initiator_role = models.CharField(max_length=20, choices=SessionRole.choices)
     status = models.CharField(
         max_length=20, 
         choices=RunResultStatus.choices, 
