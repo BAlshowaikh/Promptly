@@ -245,8 +245,8 @@ class SubmitExerciseApi(APIView):
 
 # ----- View 5: Retrieve a list of learning progress per language records for the user
 class LearningProgressListApi(APIView):
-    authentication_classes = []  
-    permission_classes = []
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         """
