@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.db.models import Prefetch
+from rest_framework.permissions import IsAuthenticated
 
 from apps.ai_models.models import AiModel
 from apps.developer.utils import (
@@ -36,6 +37,7 @@ class DevSessionListCreateView(APIView):
     Endpoint 1: List all sessions (for sidebar)
     Endpoint 2: Create Session + Configs (Wizard)
     """
+    permission_classes = [IsAuthenticated]
     
     # List all sessions
     def get(self, request):
@@ -70,6 +72,7 @@ class DevSessionDetailView(APIView):
     """
     Endpoint 3: Show session details (Coder/Explainer models configs) and handle delete
     """
+    permission_classes = [IsAuthenticated]
     def get(self, request, session_id):
         # Prefetch all teh required models at once rather than hitting the DB many times for the same requets
         session = get_object_or_404(DevSession.objects.prefetch_related('model_configs__ai_model', 
@@ -103,21 +106,28 @@ class DevSessionDetailView(APIView):
 
 # ----------- View 3: Handle requests to the LLMs (click the run or send in the chat)
 class DevRunStreamView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request, session_id):
+
         try:
             # --- 1. Validation and Setup ---
             session = get_object_or_404(DevSession, id=session_id, user=request.user)
             user_prompt = request.data.get("prompt")
+            initiator_role = request.data.get("initiator_role")  # "coder" | "explainer"
             target = request.query_params.get('target', 'pipeline')
 
             if not user_prompt:
                 return error_response(message="Prompt is required")
+            
+            if initiator_role not in ["coder", "explainer"]:
+                return error_response(message="initiator_role must be coder or explainer")
 
             # --- 2. Database Record Creation ---
             #  create this first so there is a record of the attempt
             run_instance = DevRun.objects.create(
                 session=session,
-                user_prompt=user_prompt
+                user_prompt=user_prompt,
+                initiator_role=initiator_role,
             )
 
             # --- 3. Memory Retrieval ---
