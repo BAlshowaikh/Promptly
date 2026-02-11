@@ -118,7 +118,7 @@ class DevRunOutSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DevRun
-        fields = ['id', 'user_prompt', 'context_code', 'status', 'created_at', 'results']
+        fields = ['id', "initiator_role", 'user_prompt', 'context_code', 'status', 'created_at', 'results']
         
 # ------- Serializer 9: Deatailed serializer for user session
 class DevSessionDetailOutSerializer(serializers.ModelSerializer):

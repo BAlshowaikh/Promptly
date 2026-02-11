@@ -110,6 +110,7 @@ class DevRun(models.Model):
 
     user_prompt = models.TextField()
     context_code = models.TextField(blank=True, default="")
+    initiator_role = models.CharField(max_length=20, choices=SessionRole.choices)
     status = models.CharField(
         max_length=20, 
         choices=RunResultStatus.choices, 
@@ -137,7 +138,7 @@ class DevRunResult(models.Model):
     """
     run = models.ForeignKey(DevRun, on_delete=models.CASCADE, related_name="results")
     session_model_config = models.ForeignKey(
-        DevSessionModelConfig, on_delete=models.PROTECT, related_name="run_results"
+        DevSessionModelConfig, on_delete=models.CASCADE, related_name="run_results"
     )
 
     output = models.TextField(blank=True, default="")
